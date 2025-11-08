@@ -106,7 +106,7 @@ test "substitution/view" {
 ///|
 test "jit_compile" {
   let code = @pcre2.compile("(?<hello>hello)")
-  code.jit_compile()
+  code.jit_compile(complete=true)
   let subject = "a hello, 你好  world! hello"
   let views = []
   let matches = code.matches(subject)

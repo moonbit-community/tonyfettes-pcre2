@@ -723,8 +723,32 @@ pub fn config_jit() -> Bool raise {
 extern "c" fn pcre2_jit_compile(code : Pcre2Code, options : UInt) -> Int = "moonbit_pcre2_jit_compile_16"
 
 ///|
-pub fn Code::jit_compile(code : Code) -> Unit raise Pcre2Error {
-  let rc = pcre2_jit_compile(code.0, 0)
+const PCRE2_JIT_COMPLETE : UInt = 0x00000001U
+
+///|
+const PCRE2_JIT_PARTIAL_SOFT : UInt = 0x00000002U
+
+///|
+const PCRE2_JIT_PARTIAL_HARD : UInt = 0x00000004U
+
+///|
+pub fn Code::jit_compile(
+  code : Code,
+  complete? : Bool = false,
+  partial_soft? : Bool = false,
+  partial_hard? : Bool = false,
+) -> Unit raise Pcre2Error {
+  let mut options : UInt = 0
+  if complete {
+    options = options | PCRE2_JIT_COMPLETE
+  }
+  if partial_soft {
+    options = options | PCRE2_JIT_PARTIAL_SOFT
+  }
+  if partial_hard {
+    options = options | PCRE2_JIT_PARTIAL_HARD
+  }
+  let rc = pcre2_jit_compile(code.0, options)
   if rc != 0 {
     raise Pcre2Error::Code(rc)
   }
