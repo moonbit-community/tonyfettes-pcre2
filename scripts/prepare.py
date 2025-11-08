@@ -2,6 +2,8 @@ import shutil
 from pathlib import Path
 import json
 from typing import Literal
+import urllib.request
+
 
 headers = ["pcre2_internal.h"]
 
@@ -22,6 +24,7 @@ sources = [
     "pcre2_maketables.c",
     "pcre2_match.c",
     "pcre2_match_data.c",
+    "pcre2_match_next.c",
     "pcre2_newline.c",
     "pcre2_ord2utf.c",
     "pcre2_pattern_info.c",
@@ -95,12 +98,38 @@ def prepare(source: Path, target: Path, code_unit_width: CodeUnitWidth):
     Path(target / ".gitignore").write_text("\n".join(ignored) + "\n")
 
 
+def download(url: str, dest: Path):
+    """Download a file from a URL to a destination path."""
+
+    print(f"Downloading {url} to {dest}...")
+    with urllib.request.urlopen(url) as response, open(dest, "wb") as dest_file:
+        shutil.copyfileobj(response, dest_file)
+    print("Download complete.")
+
+
+def extract(tar_path: Path, extract_to: Path):
+    """Extract a tar.bz2 file to a specified directory."""
+    import tarfile
+
+    print(f"Extracting {tar_path} to {extract_to}...")
+    with tarfile.open(tar_path, "r:bz2") as tar:
+        tar.extractall(path=extract_to)
+    print("Extraction complete.")
+
+
 def main():
-    prepare(Path("src/pcre2/src"), Path("src"), code_unit_width=16)
+    prepare_path = Path("prepare")
+    prepare_path.mkdir(exist_ok=True)
+    tarball_url = "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+    tarball_path = prepare_path / "pcre2-10.47.tar.bz2"
+    download(tarball_url, tarball_path)
+    extract(tarball_path, prepare_path)
+    pcre2_path = prepare_path / "pcre2-10.47"
+    prepare(pcre2_path / "src", Path("src"), code_unit_width=16)
     if Path("deps").exists():
         shutil.rmtree(Path("deps"))
     # JIT support
-    shutil.copytree(Path("src/pcre2/deps"), Path("deps"))
+    shutil.copytree(pcre2_path / "deps", Path("deps"))
 
 
 if __name__ == "__main__":

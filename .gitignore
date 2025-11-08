@@ -1,5 +1,6 @@
 target/
 .mooncakes/
 /publish/
+/prepare/
 /deps/
 compile_flags.txt
