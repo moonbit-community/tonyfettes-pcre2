@@ -163,12 +163,14 @@ moonbit_pcre2_substitute_16(
   moonbit_string_t output_buffer,
   uint64_t *output_length
 ) {
+  size_t pcre2_output_length = *output_length;
   int32_t result = pcre2_substitute_16(
     code->code, (subject + subject_offset), subject_length, start_offset,
     options, match_data->match_data, match_context,
     (replacement + replacement_offset), replacement_length, output_buffer,
-    output_length
+    &pcre2_output_length
   );
+  *output_length = pcre2_output_length;
   moonbit_decref(code);
   moonbit_decref(subject);
   moonbit_decref(match_data);
