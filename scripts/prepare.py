@@ -97,6 +97,8 @@ def prepare(source: Path, target: Path, code_unit_width: CodeUnitWidth):
 
 def main():
     prepare(Path("src/pcre2/src"), Path("src"), code_unit_width=16)
+    if Path("deps").exists():
+        shutil.rmtree(Path("deps"))
     # JIT support
     shutil.copytree(Path("src/pcre2/deps"), Path("deps"))
 

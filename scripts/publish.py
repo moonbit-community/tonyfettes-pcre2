@@ -22,6 +22,7 @@ def main():
     shutil.copy("README.md", publish_path / "README.md")
     shutil.copy("LICENSE", publish_path / "LICENSE")
     shutil.copytree("src", publish_path / "src")
+    shutil.copytree("deps", publish_path / "deps")
     shutil.rmtree(publish_path / "src" / "pcre2")
     (publish_path / "src" / ".gitignore").unlink()
     test(publish_path)
