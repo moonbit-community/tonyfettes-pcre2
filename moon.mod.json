@@ -8,7 +8,7 @@
   "repository": "",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": "",
+  "description": "https://github.com/moonbit-community/tonyfettes-pcre2",
   "source": "src",
   "preferred-target": "native"
 }
