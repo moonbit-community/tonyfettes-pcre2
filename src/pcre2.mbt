@@ -132,7 +132,7 @@ priv type Pcre2MatchData
 priv type Pcre2MatchContext
 
 ///|
-typealias UInt64 as Pcre2Size
+type Pcre2Size = UInt64
 
 ///|
 #owned(buffer)
@@ -515,8 +515,8 @@ pub fn Matches::next(self : Matches) -> Match? raise Pcre2Error {
         self.ovector[1] = start_offset + 1 // Advance one code unit
         if self.crlf_is_newline && // If CRLF is a newline & we are at CRLF
           start_offset < self.subject_length - 1 &&
-          self.subject[start_offset.to_int()] == '\r' &&
-          self.subject[start_offset.to_int() + 1] == '\n' {
+          self.subject.code_unit_at(start_offset.to_int()) == 13 &&
+          self.subject.code_unit_at(start_offset.to_int() + 1) == 10 {
           self.ovector[1] += 1 // Advance by one more code unit
         }
         // NOTE(translator): The original code test if the UTF8 flag is set. However,

@@ -2,9 +2,9 @@
 package "tonyfettes/pcre2"
 
 // Values
-fn compile(String) -> Code raise Pcre2Error
+pub fn compile(String) -> Code raise Pcre2Error
 
-fn config_jit() -> Bool raise
+pub fn config_jit() -> Bool raise
 
 // Errors
 pub suberror Pcre2Error {
@@ -12,28 +12,28 @@ pub suberror Pcre2Error {
   Compile(String, Int, UInt64)
   Code(Int)
 }
-impl Show for Pcre2Error
+pub impl Show for Pcre2Error
 
 // Types and methods
 type Code
-fn Code::jit_compile(Self) -> Unit raise Pcre2Error
-fn Code::matches(Self, StringView) -> Matches raise Pcre2Error
-fn Code::substitute(Self, StringView, StringView, global? : Bool) -> StringView raise
+pub fn Code::jit_compile(Self, complete? : Bool, partial_soft? : Bool, partial_hard? : Bool) -> Unit raise Pcre2Error
+pub fn Code::matches(Self, StringView) -> Matches raise Pcre2Error
+pub fn Code::substitute(Self, StringView, StringView, global? : Bool) -> StringView raise
 
 type Match
-fn[Index : MatchIndex] Match::get(Self, Index) -> StringView?
-fn Match::groups(Self) -> Iter2[Int, StringView]
-fn Match::named_groups(Self) -> Iter2[String, StringView]
-fn[Index : MatchIndex] Match::op_get(Self, Index) -> StringView
+pub fn[Index : MatchIndex] Match::get(Self, Index) -> StringView?
+pub fn Match::groups(Self) -> Iter2[Int, StringView]
+pub fn Match::named_groups(Self) -> Iter2[String, StringView]
+pub fn[Index : MatchIndex] Match::op_get(Self, Index) -> StringView
 
 type Matches
-fn Matches::next(Self) -> Match? raise Pcre2Error
+pub fn Matches::next(Self) -> Match? raise Pcre2Error
 
 // Type aliases
 
 // Traits
 trait MatchIndex
-impl MatchIndex for Int
-impl MatchIndex for String
-impl MatchIndex for StringView
+pub impl MatchIndex for Int
+pub impl MatchIndex for String
+pub impl MatchIndex for StringView
 
