@@ -117,12 +117,27 @@ fn Code::name_entry_size(self : Code) -> UInt raise Pcre2Error {
 priv type Pcre2Code
 
 ///|
+fn Pcre2Code::is_null(self : Pcre2Code) -> Bool {
+  @pointer.unsafe_borrow(self, ptr => ptr.is_null())
+}
+
+///|
 #external
 priv type Pcre2CompileContext
 
 ///|
+fn Pcre2CompileContext::null() -> Pcre2CompileContext {
+  @c.Pointer::unsafe_into(@c.Pointer::null())
+}
+
+///|
 #external
 priv type Pcre2GeneralContext
+
+///|
+fn Pcre2GeneralContext::null() -> Pcre2GeneralContext {
+  @c.Pointer::unsafe_into(@c.Pointer::null())
+}
 
 ///|
 priv type Pcre2MatchData
@@ -130,6 +145,11 @@ priv type Pcre2MatchData
 ///|
 #external
 priv type Pcre2MatchContext
+
+///|
+fn Pcre2MatchContext::null() -> Pcre2MatchContext {
+  @c.Pointer::unsafe_into(@c.Pointer::null())
+}
 
 ///|
 type Pcre2Size = UInt64
@@ -150,14 +170,14 @@ extern "c" fn pcre2_compile_16(
   options : UInt,
   error_code : Ref[Int],
   error_offset : Ref[Pcre2Size],
-  context : @c.Nullable[Pcre2CompileContext],
-) -> @c.Nullable[Pcre2Code] = "moonbit_pcre2_compile_16"
+  context : Pcre2CompileContext,
+) -> Pcre2Code = "moonbit_pcre2_compile_16"
 
 ///|
 #owned(code)
 extern "c" fn pcre2_match_data_create_from_pattern_16(
   code : Pcre2Code,
-  context : @c.Nullable[Pcre2GeneralContext],
+  context : Pcre2GeneralContext,
 ) -> Pcre2MatchData = "moonbit_pcre2_match_data_create_from_pattern_16"
 
 ///|
@@ -176,7 +196,7 @@ extern "c" fn pcre2_substitute_16(
   start_offset : Pcre2Size,
   options : UInt,
   match_data : Pcre2MatchData,
-  match_context : @c.Nullable[Pcre2MatchContext],
+  match_context : Pcre2MatchContext,
   replacement : String,
   replacement_offset : Pcre2Size,
   replacement_length : Pcre2Size,
@@ -197,7 +217,7 @@ extern "c" fn pcre2_match_16(
   start_offset : Pcre2Size,
   options : UInt,
   match_data : Pcre2MatchData,
-  context : @c.Nullable[Pcre2MatchContext],
+  context : Pcre2MatchContext,
 ) -> Int = "moonbit_pcre2_match_16"
 
 ///|
@@ -229,16 +249,16 @@ pub fn compile(pattern : String) -> Code raise Pcre2Error {
     0,
     error_code,
     error_offset,
-    @c.none(),
-  ).to()
-  match code {
-    Some(code) => code
-    None =>
-      if error_code.val > 0 {
-        raise Pcre2Error::Compile(pattern, error_code.val, error_offset.val)
-      } else {
-        raise Pcre2Error::Code(error_code.val)
-      }
+    Pcre2CompileContext::null(),
+  )
+  if code.is_null() {
+    if error_code.val > 0 {
+      raise Pcre2Error::Compile(pattern, error_code.val, error_offset.val)
+    } else {
+      raise Pcre2Error::Code(error_code.val)
+    }
+  } else {
+    code
   }
 }
 
@@ -448,7 +468,7 @@ pub fn Matches::next(self : Matches) -> Match? raise Pcre2Error {
         self.subject_start_offset,
         0,
         match_data,
-        @c.none(),
+        Pcre2MatchContext::null(),
       )
       if rc == ERROR_NOMATCH {
         return None
@@ -491,7 +511,7 @@ pub fn Matches::next(self : Matches) -> Match? raise Pcre2Error {
         start_offset,
         options,
         match_data,
-        @c.none(),
+        Pcre2MatchContext::null(),
       )
 
       // This time, a result of NOMATCH isn't an error. If the value in "options"
@@ -634,7 +654,10 @@ pub fn Code::matches(
 ) -> Matches raise Pcre2Error {
   // The following code has been adapted from the pcre2demo.c file in the PCRE2
   // library.
-  let match_data = pcre2_match_data_create_from_pattern_16(self.0, @c.none())
+  let match_data = pcre2_match_data_create_from_pattern_16(
+    self.0,
+    Pcre2GeneralContext::null(),
+  )
   let subject_start_offset = subject.start_offset().to_uint64()
   let subject_length = subject_start_offset + subject.length().to_uint64()
   let crlf_is_newline = match self.newline() {
@@ -666,7 +689,10 @@ pub fn Code::substitute(
   replacement : StringView,
   global? : Bool = false,
 ) -> StringView raise {
-  let match_data = pcre2_match_data_create_from_pattern_16(self.0, @c.none())
+  let match_data = pcre2_match_data_create_from_pattern_16(
+    self.0,
+    Pcre2GeneralContext::null(),
+  )
   let subject_length = subject.length().to_uint64()
   let replacement_length = replacement.length().to_uint64()
   let output_length : Ref[UInt64] = Ref::new(subject.length().to_uint64() * 2)
@@ -685,7 +711,7 @@ pub fn Code::substitute(
       start_offset,
       options,
       match_data,
-      @c.Nullable::none(),
+      Pcre2MatchContext::null(),
       replacement.data(),
       replacement.start_offset().to_uint64(),
       replacement_length,

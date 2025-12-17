@@ -1,6 +1,7 @@
 {
   "import": [
-    "tonyfettes/c"
+    "tonyfettes/c",
+    "tonyfettes/c/pointer"
   ],
   "targets": {
     "pcre2.mbt": [
