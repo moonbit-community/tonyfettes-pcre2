@@ -18,7 +18,6 @@ def main():
     shutil.copy("LICENSE", publish_path / "LICENSE")
     shutil.copytree("src", publish_path / "src")
     shutil.copytree("deps", publish_path / "deps")
-    shutil.rmtree(publish_path / "src" / "pcre2")
     (publish_path / "src" / ".gitignore").unlink()
     test(publish_path)
     for test_path in (publish_path / "src").rglob("*_test.mbt"):

@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/pcre2",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "deps": {
     "tonyfettes/c": "0.7.1"
   },
