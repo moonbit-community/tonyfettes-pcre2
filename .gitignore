@@ -4,3 +4,5 @@ target/
 /prepare/
 /deps/
 compile_flags.txt
+_build/
+target
