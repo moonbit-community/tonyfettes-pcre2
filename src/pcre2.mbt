@@ -317,32 +317,30 @@ pub fn[Index : MatchIndex] Match::get(
 }
 
 ///|
-pub fn Match::groups(self : Match) -> Iter2[Int, StringView] {
-  Iter2::new(each => {
-    for i in 0..<(self.code_unit_offsets.length() / 2) {
+pub fn Match::groups(self : Match) -> Iterator2[Int, StringView] {
+  let mut i = 0
+  let total = self.code_unit_offsets.length() / 2
+  Iterator2::new(fn() {
+    if i < total {
       let start = self.code_unit_offsets[2 * i]
       let end = self.code_unit_offsets[2 * i + 1]
-      match each(i, self.subject.view(start_offset=start, end_offset=end)) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      let index = i
+      i += 1
+      Some((index, self.subject.view(start_offset=start, end_offset=end)))
+    } else {
+      None
     }
-    IterContinue
   })
 }
 
 ///|
-pub fn Match::named_groups(self : Match) -> Iter2[String, StringView] {
-  Iter2::new(each => {
-    for name, index in self.name_table {
-      let start = self.code_unit_offsets[2 * index]
-      let end = self.code_unit_offsets[2 * index + 1]
-      match each(name, self.subject.view(start_offset=start, end_offset=end)) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
-    }
-    IterContinue
+pub fn Match::named_groups(self : Match) -> Iterator2[String, StringView] {
+  let iter = self.name_table.iterator2()
+  Iterator2::new(fn() {
+    guard iter.next() is Some((name, index)) else { None }
+    let start = self.code_unit_offsets[2 * index]
+    let end = self.code_unit_offsets[2 * index + 1]
+    Some((name, self.subject.view(start_offset=start, end_offset=end)))
   })
 }
 

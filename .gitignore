@@ -5,4 +5,5 @@ target/
 /deps/
 compile_flags.txt
 _build/
+_build
 target
