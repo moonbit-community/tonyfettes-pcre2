@@ -317,7 +317,7 @@ pub fn[Index : MatchIndex] Match::get(
 }
 
 ///|
-pub fn Match::groups(self : Match) -> Iterator2[Int, StringView] {
+pub fn Match::groups(self : Match) -> Iter2[Int, StringView] {
   let mut i = 0
   let total = self.code_unit_offsets.length() / 2
   Iterator2::new(fn() {
@@ -330,18 +330,18 @@ pub fn Match::groups(self : Match) -> Iterator2[Int, StringView] {
     } else {
       None
     }
-  })
+  }).iter2()
 }
 
 ///|
-pub fn Match::named_groups(self : Match) -> Iterator2[String, StringView] {
+pub fn Match::named_groups(self : Match) -> Iter2[String, StringView] {
   let iter = self.name_table.iterator2()
   Iterator2::new(fn() {
     guard iter.next() is Some((name, index)) else { None }
     let start = self.code_unit_offsets[2 * index]
     let end = self.code_unit_offsets[2 * index + 1]
     Some((name, self.subject.view(start_offset=start, end_offset=end)))
-  })
+  }).iter2()
 }
 
 ///|

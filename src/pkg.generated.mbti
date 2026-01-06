@@ -22,8 +22,8 @@ pub fn Code::substitute(Self, StringView, StringView, global? : Bool) -> StringV
 
 type Match
 pub fn[Index : MatchIndex] Match::get(Self, Index) -> StringView?
-pub fn Match::groups(Self) -> Iterator2[Int, StringView]
-pub fn Match::named_groups(Self) -> Iterator2[String, StringView]
+pub fn Match::groups(Self) -> Iter2[Int, StringView]
+pub fn Match::named_groups(Self) -> Iter2[String, StringView]
 pub fn[Index : MatchIndex] Match::op_get(Self, Index) -> StringView
 
 type Matches
